@@ -1,5 +1,28 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, g
+import sqlite3
+
 app = Flask(__name__)
+
+MENUDB = 'menu.db'
+
+def fetchMenu(con):
+    burgers = []
+    free = '0'
+    cur = con.execute('SELECT burger,price FROM burgers WHERE price>=?', (free,))
+    for row in cur:
+        burgers.append(list(row))
+
+    drinks = []
+    cur = con.execute('SELECT drink,price FROM drinks')
+    for row in cur:
+        drinks.append(list(row))
+
+    sides = []
+    cur = con.execute('SELECT side,price FROM sides')
+    for row in cur:
+        sides.append(list(row))
+
+    return {'burgers':burgers, 'drinks':drinks, 'sides':sides}
 
 burgers = [
  ['Classic Burger', '$4.99'],
@@ -21,12 +44,55 @@ sides = [
 ]
 @app.route('/')
 def index():
-    return render_template('index.html',
+    con = sqlite3.connect(MENUDB)
+    menu = fetchMenu(con)
+    con.close()
+
+    db = sqlite3.connect(MENUDB)
+    print(db)
+
+    cur = db.execute('SELECT burger,price FROM burgers')
+    for row in cur:
+        print(row)
+
+    return render_template(
+                           'index.html',
                            disclaimer='may contain nuts',
-                           burgers=burgers,
-                           drinks=drinks,
-                           sides=sides)
+                           burgers=menu['burgers'],
+                           drinks=menu['drinks'],
+                           sides=menu['sides'])
+
 
 @app.route('/order')
 def order():
-    return render_template('order.html')
+    con = sqlite3.connect(MENUDB)
+    menu = fetchMenu(con)
+    con.close()
+
+    con = sqlite3.connect(MENUDB)
+
+    burgers = []
+    free = '0'
+    cur = con.execute('SELECT burger,price FROM burgers WHERE price>=?', (free,))
+    for row in cur:
+        burgers.append(list(row))
+
+
+    drinks = []
+    cur = con.execute('SELECT drink, price FROM drinks')
+    for row in cur:
+        drinks.append(list(row))
+
+
+    sides = []
+    cur = con.execute('SELECT side, price FROM sides')
+    for row in cur:
+        sides.append(list(row))
+
+    con.close()
+
+    return render_template('order.html', burgers=menu['burgers'], drinks=menu['drinks'], sides=menu['sides'])
+
+@app.route('/confirm')
+def confirm():
+    return render_template('confirm.html')

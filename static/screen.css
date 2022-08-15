@@ -191,6 +191,16 @@ textarea{
   width: 100%;
 }
 
+/*firefox */
+input[type = "number"] {
+  -moz-appearance: textfield;
+}
+/* chrome, safari, edge, opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button{
+  -webkit-appearance: none;
+  margin: 0;
+}
 
 /* media query */
 

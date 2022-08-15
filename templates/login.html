@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Login - 212 Burgers{% endblock %}
+
+{% block content %}
+
+    <h1 class="center-text">Login</h1>
+
+    <form action="/login" id="login" method="post">
+      <p>
+        <label for="username">Username:</label><br />
+        <input type="text" id="username" name="username" autocomplete="off" required />
+      </p>
+      <p><input type="submit" value="login" class="btn-yellow" /></p>
+    </form>
+
+{% endblock %}
